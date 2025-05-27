@@ -2,3 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
+cats_vs_dogs_small
+dogs-vs-cats
+pets_dataset
+*.keras

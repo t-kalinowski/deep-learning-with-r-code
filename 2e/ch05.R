@@ -1,11 +1,11 @@
 ## ----setup, include = FALSE-----------------------------------------------
 tensorflow::as_tensor(1)
-library(keras)
+library(keras3)
 
 
 
 ## -------------------------------------------------------------------------
-library(keras)
+library(keras3)
 
 mnist <- dataset_mnist()
 train_labels <- mnist$train$y

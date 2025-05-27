@@ -1,6 +1,6 @@
 ## ----setup, include = FALSE-----------------------------------------------
 library(tensorflow)
-library(keras)
+library(keras3)
 tf_function(function(x) x+1)(as_tensor(1))
 
 
@@ -10,7 +10,7 @@ tf_function(function(x) x+1)(as_tensor(1))
 ## library(reticulate)
 ## virtualenv_create("r-reticulate", python = install_python())
 ##
-## library(keras)
+## library(keras3)
 ## install_keras(envname = "r-reticulate")
 
 

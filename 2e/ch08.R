@@ -1,5 +1,5 @@
 ## ----setup, include = FALSE-----------------------------------------------
-library(keras)
+library(keras3)
 tensorflow::tf_function(function(x) x + 1)(1)
 
 
@@ -36,7 +36,7 @@ model %>% fit(train_images, train_labels, epochs = 5, batch_size = 64)
 
 ## -------------------------------------------------------------------------
 result <- evaluate(model, test_images, test_labels)
-cat("Test accuracy:", result['accuracy'], "\n")
+cat("Test accuracy:", result$accuracy, "\n")
 
 
 ## -------------------------------------------------------------------------
@@ -149,7 +149,7 @@ test_dataset <-
 
 
 ## -------------------------------------------------------------------------
-library(tfdatasets)
+library(tfdatasets, exclude = "shape")
 example_array <- array(seq(100*6), c(100, 6))
 head(example_array)
 dataset <- tensor_slices_dataset(example_array)
@@ -221,9 +221,9 @@ plot(history)
 
 
 ## -------------------------------------------------------------------------
-test_model <- load_model_tf("convnet_from_scratch.keras")
+test_model <- load_model("convnet_from_scratch.keras")
 result <- evaluate(test_model, test_dataset)
-cat(sprintf("Test accuracy: %.3f\n", result["accuracy"]))
+cat(sprintf("Test accuracy: %.3f\n", result$accuracy))
 
 
 ## -------------------------------------------------------------------------
@@ -238,7 +238,7 @@ data_augmentation <- keras_model_sequential() %>%
 
 
 ## -------------------------------------------------------------------------
-library(tfdatasets)
+library(tfdatasets, exclude = "shape")
 batch <- train_dataset %>%
   as_iterator() %>%
   iter_next()
@@ -305,9 +305,9 @@ plot(history)
 
 
 ## -------------------------------------------------------------------------
-test_model <- load_model_tf("convnet_from_scratch_with_augmentation.keras")
+test_model <- load_model("convnet_from_scratch_with_augmentation.keras")
 result <- evaluate(test_model, test_dataset)
-cat(sprintf("Test accuracy: %.3f\n", result["accuracy"]))
+cat(sprintf("Test accuracy: %.3f\n", result$accuracy))
 
 
 ## -------------------------------------------------------------------------
@@ -446,10 +446,10 @@ history <- model %>% fit(
 
 
 ## -------------------------------------------------------------------------
-test_model <- load_model_tf(
+test_model <- load_model(
   "feature_extraction_with_data_augmentation.keras")
 result <- evaluate(test_model, test_dataset)
-cat(sprintf("Test accuracy: %.3f\n", result["accuracy"]))
+cat(sprintf("Test accuracy: %.3f\n", result$accuracy))
 
 
 ## -------------------------------------------------------------------------
@@ -485,6 +485,6 @@ history <- model %>% fit(
 
 
 ## -------------------------------------------------------------------------
-model <- load_model_tf("fine_tuning.keras")
+model <- load_model("fine_tuning.keras")
 result <-  evaluate(model, test_dataset)
-cat(sprintf("Test accuracy: %.3f\n", result["accuracy"]))
+cat(sprintf("Test accuracy: %.3f\n", result$accuracy))

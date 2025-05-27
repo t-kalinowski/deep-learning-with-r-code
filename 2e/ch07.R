@@ -1,10 +1,25 @@
 ## ----setup, include = FALSE-----------------------------------------------
-library(keras)
+# LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/:$CUDNN_PATH/lib
+library(keras3)
+use_virtualenv("r-reticulate")
+# Sys.unsetenv("RETICULATE_PYTHON")
+# Sys.setenv("LD_DEBUG" = "libcudnn.so.8")
+# use_condaenv("tf")
+#
+#
+# Sys.getenv("LD_LIBRARY_PATH")
+#
+# Sys.setenv("LD_LIBRARY_PATH" = paste0(c(
+#   "/home/tomasz/.local/share/r-miniconda/envs/tf/lib/",
+#   "/home/tomasz/.local/share/r-miniconda/envs/tf/lib/python3.9/site-packages/nvidia/cudnn/lib"
+# ), collapse = ":"))
+
+  # "/home/tomasz/.virtualenvs/r-reticulate/lib/python3.9/site-packages/nvidia/cudnn/lib")
 tensorflow::tf_function(function(x) x + 1)(1)
 
 
 ## -------------------------------------------------------------------------
-library(keras)
+library(keras3)
 
 model <- keras_model_sequential() %>%
   layer_dense(64, activation = "relu") %>%
@@ -18,7 +33,7 @@ model %>% layer_dense(10, activation="softmax")
 
 
 ## ---- error = TRUE--------------------------------------------------------
-model$weights
+# model$weights
 
 
 ## -------------------------------------------------------------------------
@@ -461,7 +476,7 @@ model %>% fit(
 
 
 ## -------------------------------------------------------------------------
-model <- load_model_tf("checkpoint_path.keras")
+model <- load_model("checkpoint_path.keras")
 
 
 ## ---- eval = FALSE--------------------------------------------------------
@@ -628,7 +643,7 @@ reset_metrics <- function() {
 
 
 ## -------------------------------------------------------------------------
-library(tfdatasets)
+library(tfdatasets, exclude = "shape")
 training_dataset <-
   list(train_images, train_labels) %>%
   tensor_slices_dataset() %>%
@@ -736,14 +751,21 @@ loss_tracker <- metric_mean(name = "loss")
 CustomModel <- new_model_class(
   classname = "CustomModel",
 
+  compile = function(optimizer, loss_fn, ...) {
+    super$compile(...)
+    optimizer$build(self$variables)
+    self$optimizer <- optimizer
+    self$loss_fn <- loss_fn
+  },
+
   train_step = function(data) {
     c(inputs, targets) %<-% data
     with(tf$GradientTape() %as% tape, {
       predictions <- self(inputs, training = TRUE)
-      loss <- loss_fn(targets, predictions)
+      loss <- self$loss_fn(targets, predictions)
     })
     gradients <- tape$gradient(loss, model$trainable_weights)
-    optimizer$apply_gradients(zip_lists(gradients, model$trainable_weights))
+    self$optimizer$apply_gradients(zip_lists(gradients, model$trainable_weights))
 
     loss_tracker$update_state(loss)
     list(loss = loss_tracker$result())
@@ -763,7 +785,7 @@ outputs <- features %>%
 
 model <- CustomModel(inputs = inputs, outputs = outputs)
 
-model %>% compile(optimizer = optimizer_rmsprop())
+model %>% compile(optimizer = optimizer_rmsprop(), loss = loss_fn)
 model %>% fit(train_images, train_labels, epochs = 3)
 
 
@@ -772,6 +794,13 @@ CustomModel <- new_model_class(
 
   classname = "CustomModel",
 
+  compile = function(optimizer, loss_fn, ...) {
+    super$compile(...)
+    optimizer$build(self$variables)
+    self$optimizer <- optimizer
+    self$loss_fn <- loss_fn
+  },
+
   train_step = function(data) {
     c(inputs, targets) %<-% data
     with(tf$GradientTape() %as% tape, {
@@ -779,7 +808,7 @@ CustomModel <- new_model_class(
       loss <- self$compiled_loss(targets, predictions)
     })
     gradients <- tape$gradient(loss, model$trainable_weights)
-    optimizer$apply_gradients(zip_lists(gradients, model$trainable_weights))
+    self$optimizer$apply_gradients(zip_lists(gradients, model$trainable_weights))
     self$compiled_metrics$update_state(targets, predictions)
     results <- list()
     for(metric in self$metrics)

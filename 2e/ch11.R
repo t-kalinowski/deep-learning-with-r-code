@@ -1,5 +1,5 @@
 ## ----setup, include = FALSE-----------------------------------------------
-library(keras)
+library(keras3)
 tensorflow::as_tensor(1)
 
 
@@ -184,8 +184,8 @@ for (category in c("neg", "pos")) {
 
 
 ## -------------------------------------------------------------------------
-library(keras)
-library(tfdatasets)
+library(keras3)
+library(tfdatasets, exclude = "shape")
 
 train_ds <- text_dataset_from_directory("aclImdb/train")
 val_ds <- text_dataset_from_directory("aclImdb/val")
@@ -267,7 +267,7 @@ model %>% fit(
 
 
 ## -------------------------------------------------------------------------
-model <- load_model_tf("binary_1gram.keras")
+model <- load_model("binary_1gram.keras")
 cat(sprintf(
   "Test acc: %.3f\n", evaluate(model, binary_1gram_test_ds)["accuracy"]))
 
@@ -313,7 +313,7 @@ model %>% fit(
 
 
 ## -------------------------------------------------------------------------
-model <- load_model_tf("binary_2gram.keras")
+model <- load_model("binary_2gram.keras")
 evaluate(model, binary_2gram_test_ds)["accuracy"] %>%
   sprintf("Test acc: %.3f\n", .) %>% cat()
 
@@ -371,7 +371,7 @@ model %>% fit(
 
 
 ## -------------------------------------------------------------------------
-model <- load_model_tf("tfidf_2gram.keras")
+model <- load_model("tfidf_2gram.keras")
 evaluate(model, tfidf_2gram_test_ds)["accuracy"] %>%
   sprintf("Test acc: %.3f", .) %>% cat("\n")
 
@@ -445,7 +445,7 @@ model %>% fit(int_train_ds_smaller, validation_data = int_val_ds,
 
 
 ## -------------------------------------------------------------------------
-model <- load_model_tf("one_hot_bidir_lstm.keras")
+model <- load_model("one_hot_bidir_lstm.keras")
 sprintf("Test acc: %.3f", evaluate(model, int_test_ds)["accuracy"])
 
 
@@ -481,7 +481,7 @@ model %>%
 
 
 ## -------------------------------------------------------------------------
-model <- load_model_tf("embeddings_bidir_lstm.keras")
+model <- load_model("embeddings_bidir_lstm.keras")
 evaluate(model, int_test_ds)["accuracy"] %>%
   sprintf("Test acc: %.3f\n", .) %>% cat("\n")
 
@@ -530,7 +530,7 @@ model %>% fit(
 
 
 ## -------------------------------------------------------------------------
-model <- load_model_tf("embeddings_bidir_lstm_with_masking.keras")
+model <- load_model("embeddings_bidir_lstm_with_masking.keras")
 cat(sprintf("Test acc: %.3f\n",
             evaluate(model, int_test_ds)["accuracy"]))
 
@@ -610,7 +610,7 @@ model %>%
 
 
 ## -------------------------------------------------------------------------
-model <- load_model_tf("glove_embeddings_sequence_model.keras")
+model <- load_model("glove_embeddings_sequence_model.keras")
 cat(sprintf(
   "Test acc: %.3f\n", evaluate(model, int_test_ds)["accuracy"]))
 
@@ -752,12 +752,12 @@ filename <- tempfile(fileext = ".keras")
 
 ## -------------------------------------------------------------------------
 model <- save_model_tf(model, filename)
-model <- load_model_tf(filename,
+model <- load_model(filename,
                        custom_objects = list(layer_transformer_encoder))
 
 
 ## -------------------------------------------------------------------------
-model <- load_model_tf(
+model <- load_model(
   filename,
   custom_objects = list(TransformerEncoder = layer_transformer_encoder))
 
@@ -823,7 +823,7 @@ model %>% fit(
 
 
 ## -------------------------------------------------------------------------
-model <- load_model_tf("transformer_encoder.keras",
+model <- load_model("transformer_encoder.keras",
                        custom_objects = layer_transformer_encoder)
 
 sprintf("Test acc: %.3f", evaluate(model, int_test_ds)["accuracy"])
@@ -907,7 +907,7 @@ model %>% fit(
 
 
 ## -------------------------------------------------------------------------
-model <- load_model_tf(
+model <- load_model(
   "full_transformer_encoder.keras",
   custom_objects = list(layer_transformer_encoder,
                         layer_positional_embedding))
@@ -1003,7 +1003,7 @@ format_pair <- function(pair) {
 
 batch_size <- 64
 
-library(tfdatasets)
+library(tfdatasets, exclude = "shape")
 make_dataset <- function(pairs) {
   tensor_slices_dataset(pairs) %>%
     dataset_map(format_pair, num_parallel_calls = 4) %>%
@@ -1252,7 +1252,7 @@ transformer %>%
 
 
 ## ---- eval=FALSE, include=FALSE-------------------------------------------
-## transformer <- load_model_tf(
+## transformer <- load_model(
 ##   "end_to_end_transformer.keras",
 ##   custom_objects = list(
 ##     layer_positional_embedding,

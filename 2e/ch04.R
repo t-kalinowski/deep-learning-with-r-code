@@ -3,7 +3,7 @@ tensorflow::as_tensor(1)
 
 
 ## -------------------------------------------------------------------------
-library(keras)
+library(keras3)
 
 imdb <- dataset_imdb(num_words = 10000)
 c(c(train_data, train_labels), c(test_data, test_labels)) %<-% imdb
@@ -422,7 +422,7 @@ result <- model %>% evaluate(test_data, test_targets)
 
 
 ## -------------------------------------------------------------------------
-result["mae"]
+result$mae
 
 
 ## -------------------------------------------------------------------------

@@ -1,5 +1,5 @@
 ## ----setup, include=FALSE-------------------------------------------------
-library(keras)
+library(keras3)
 tensorflow::as_tensor(1)
 
 
@@ -78,7 +78,7 @@ normalize_input_data <- function(df) {
 
 
 ## -------------------------------------------------------------------------
-library(keras)
+library(keras3)
 int_sequence <- seq(10)
 dummy_dataset <- timeseries_dataset_from_array(
   data = head(int_sequence, -3),
@@ -87,7 +87,7 @@ dummy_dataset <- timeseries_dataset_from_array(
   batch_size = 2
 )
 
-library(tfdatasets)
+library(tfdatasets, exclude = "shape")
 dummy_dataset_iterator <- as_array_iterator(dummy_dataset)
 
 repeat {
@@ -214,7 +214,7 @@ history <- model %>%
 
 
 ## -------------------------------------------------------------------------
-model <- load_model_tf("jena_dense.keras")
+model <- load_model("jena_dense.keras")
 sprintf("Test MAE: %.2f", evaluate(model, test_dataset)["mae"])
 
 
@@ -252,7 +252,7 @@ history <- model %>% fit(
 
 
 ## -------------------------------------------------------------------------
-model <- load_model_tf("jena_conv.keras")
+model <- load_model("jena_conv.keras")
 sprintf("Test MAE: %.2f", evaluate(model, test_dataset)["mae"])
 
 
@@ -296,7 +296,7 @@ local({
 
 
 ## -------------------------------------------------------------------------
-model <- load_model_tf("jena_lstm.keras")
+model <- load_model("jena_lstm.keras")
 sprintf("Test MAE: %.2f", evaluate(model, test_dataset)["mae"])
 
 
@@ -467,7 +467,7 @@ plot(history)
 
 
 ## -------------------------------------------------------------------------
-model <- load_model_tf("jena_stacked_gru_dropout.keras")
+model <- load_model("jena_stacked_gru_dropout.keras")
 sprintf("Test MAE: %.2f", evaluate(model, test_dataset)["mae"])
 
 

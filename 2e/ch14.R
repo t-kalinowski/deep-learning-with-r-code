@@ -1,6 +1,6 @@
 ## ----setup, include=FALSE-------------------------------------------------
 library(tensorflow)
-library(keras)
+library(keras3)
 tensorflow::as_tensor(1)
 
 

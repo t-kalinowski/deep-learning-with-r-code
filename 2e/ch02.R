@@ -4,7 +4,7 @@ tensorflow::as_tensor(1)
 
 ## -------------------------------------------------------------------------
 library(tensorflow)
-library(keras)
+library(keras3)
 mnist <- dataset_mnist()
 train_images <- mnist$train$x
 train_labels <- mnist$train$y
@@ -87,7 +87,7 @@ length(dim(x))
 
 
 ## -------------------------------------------------------------------------
-library(keras)
+library(keras3)
 mnist <- dataset_mnist()
 train_images <- mnist$train$x
 train_labels <- mnist$train$y
@@ -387,7 +387,7 @@ str(grad_of_y_wrt_W_and_b)
 
 
 ## -------------------------------------------------------------------------
-library(keras)
+library(keras3)
 mnist <- dataset_mnist()
 train_images <- mnist$train$x
 train_images <- array_reshape(train_images, c(60000, 28 * 28))

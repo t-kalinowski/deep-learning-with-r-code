@@ -1,7 +1,56 @@
-## ----setup, include = FALSE-----------------------------------------------
-library(keras)
-tensorflow::tf_function(function(x) x + 1)(1)
+setwd("~/github/t-kalinowski/deep-learning-with-R-2nd-edition-code/")
+reticulate::use_virtualenv("r-keras")
+reticulate::py_run_string(r"--(
+import signal as signal_mod
+og_signal_signal = signal_mod.signal
+def signal(signalnum, handler):
+  print(f"setting signal.signal({signalnum}, {handler})")
+  return og_signal_signal(signalnum, handler)
 
+signal_mod.signal = signal
+)--", local = TRUE)
+
+## ----setup, include = FALSE-----------------------------------------------
+# Sys.setenv("CUDA_VISIBLE_DEVICES" = "")
+# Sys.setenv(TF_USE_LEGACY_KERAS = "1")
+# reticulate::use_virtualenv("r-tensorflow")
+# reticulate::py_install("keras")
+#
+library(keras3)
+# reticulate::register_class_filter(function(x) {
+#   if(!is.na(m <- match("keras.src.models.model.Model", x)))
+#     x <- unique(append(x, "keras.engine.training.Model", after = m))
+#
+#   if(!is.na(m <- match("keras.src.models.sequential.Sequential", x)))
+#     x <- unique(append(x, "keras.engine.sequential.Sequential", after = m))
+#
+#   x
+# })
+#
+# load_model <- load_model_tf
+# shape <- dim
+
+
+
+
+# registerS3method("compile", "keras.src.models.model.Model", keras:::compile.keras.engine.training.Model)
+# registerS3method("fit", "keras.src.models.model.Model", keras:::compile.keras.engine.training.Model)
+# use_backend("jax")
+tensorflow::tf_function(function(x) x + 1)(1)
+# reticulate::register_class_filter(function(x) {
+#   if(!is.na(m <- match("keras.src.models.model.Model", x)))
+#     x <- unique(append(x, "keras.engine.training.Model", after = m))
+#
+#   if(!is.na(m <- match("keras.src.models.sequential.Sequential", x)))
+#     x <- unique(append(x, "keras.engine.sequential.Sequential", after = m))
+#
+#   x
+# })
+
+
+
+# load_model <- load_model_tf
+# shape <- dim
 
 ## -------------------------------------------------------------------------
 library(fs)
@@ -10,6 +59,7 @@ dir_create(data_dir)
 
 
 ## ---- eval = FALSE--------------------------------------------------------
+options(timeout = .Machine$integer.max)
 ## data_url <- path("http://www.robots.ox.ac.uk/~vgg/data/pets/data")
 ## for (filename in c("images.tar.gz", "annotations.tar.gz")) {
 ##   download.file(url =  data_url / filename,
@@ -46,7 +96,8 @@ display_image_tensor <- function(x, ..., max = 255,
 
 
 ## -------------------------------------------------------------------------
-library(tensorflow)
+library(tensorflow, exclude = c("shape", "set_random_seed"))
+
 image_tensor <- image_paths$input[10] %>%
   tf$io$read_file() %>%
   tf$io$decode_jpeg()
@@ -68,7 +119,7 @@ display_target_tensor(target)
 
 
 ## -------------------------------------------------------------------------
-library(tfdatasets)
+library(tfdatasets, exclude = "shape")
 
 tf_read_image <-
   function(path, format = "image", resize = NULL, ...) {
@@ -158,20 +209,29 @@ callbacks <- list(
   callback_model_checkpoint("oxford_segmentation.keras",
                             save_best_only = TRUE))
 
-history <- model %>% fit(
-  train_dataset,
-  epochs=50,
-  callbacks=callbacks,
-  validation_data=validation_dataset
-)
+# Sys.sleep(1)
+# stop()
+#
+#
+# for (i in 1:5) {
+#   cat("\n-------", i, "-----------\n")
+# model$fit(train_dataset$take(10L), epochs = 4L)
+  # history <- model %>% fit(
+  #   train_dataset$take(5L),
+  #   epochs = 10,
+  #   # callbacks=callbacks,
+  #   view_metrics = FALSE,
+  #   validation_data = validation_dataset$take(5L)
+  # )
+# }
 
 
 ## -------------------------------------------------------------------------
-plot(history)
+# plot(history)
 
 
 ## -------------------------------------------------------------------------
-model <- load_model_tf("oxford_segmentation.keras")
+model <- load_model("oxford_segmentation.keras")
 
 
 ## -------------------------------------------------------------------------
@@ -234,7 +294,7 @@ residual_block <- function(x, filters, pooling = FALSE) {
   if (pooling) {
     x <- x %>% layer_max_pooling_2d(pool_size = 2, padding = "same")
     residual <- residual %>% layer_conv_2d(filters, 1, strides = 2)
-  } else if (filters != dim(residual)[4]) {
+  } else if (filters != residual$shape[[4]]) {
     residual <- residual %>% layer_conv_2d(filters, 1)
   }
 
@@ -356,11 +416,12 @@ model %>%
 
 
 ## -------------------------------------------------------------------------
-history <- model %>%
-  fit(
-    train_dataset,
-    epochs=100,
-    validation_data=validation_dataset)
+history <- model |> fit(
+  train_dataset,
+  epochs = 100,
+  validation_data = validation_dataset,
+  verbose = 2
+)
 
 
 ## -------------------------------------------------------------------------
@@ -368,7 +429,7 @@ plot(history)
 
 
 ## -------------------------------------------------------------------------
-model <- load_model_tf("convnet_from_scratch_with_augmentation.keras")
+model <- load_model("convnet_from_scratch_with_augmentation.keras")
 model
 
 

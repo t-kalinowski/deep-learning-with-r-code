@@ -1,5 +1,5 @@
 ## ----setup----------------------------------------------------------------
-library(keras)
+library(keras3)
 library(tensorflow)
 library(tfautograph)
 tensorflow::as_tensor(1)
@@ -24,8 +24,8 @@ reweight_distribution <-
 
 ## -------------------------------------------------------------------------
 library(tensorflow)
-library(tfdatasets)
-library(keras)
+library(tfdatasets, exclude = "shape")
+library(keras3)
 dataset <- text_dataset_from_directory(directory = "aclImdb",
                                        label_mode = NULL,
                                        batch_size = 256)
@@ -322,7 +322,7 @@ model %>%
 
 
 ## ---- include = FALSE-----------------------------------------------------
-model <- keras::load_model_tf(
+model <- keras::load_model(
   "text_generator.keras",
   custom_objects = list(layer_transformer_decoder,
                         layer_positional_embedding)
@@ -894,7 +894,7 @@ dataset <- image_dataset_from_directory(
 
 
 ## -------------------------------------------------------------------------
-library(tfdatasets)
+library(tfdatasets, exclude = "shape")
 dataset %<>% dataset_map(~ .x / 255)
 
 
